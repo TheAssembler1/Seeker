@@ -11,6 +11,7 @@ import engine.genmanagers.BufferManager;
 import engine.genmanagers.TextureManager;
 import engine.light.Light;
 import engine.model.ModelInitTransform;
+import engine.model.ModelRaw;
 import engine.model.renderer.ModelRenderer;
 import engine.model.Model;
 
@@ -19,30 +20,29 @@ public class Entry {
 	public static void main(String[] args) throws Exception {
 		DisplayManager.Load();
 		
-		ModelRenderer model_renderer = new ModelRenderer();
-		
 		CameraInitTransform camera_init_transform = new CameraInitTransform(new Vector3f(0.0f, 0.0f, 0.0f), 0, 0, 0);
 		Camera camera = new Camera(camera_init_transform);
 		
-		ModelInitTransform model_init_transform = new ModelInitTransform(new Vector3f(0.0f, -4f, -17.0f), new Vector3f(0.0f, 0.0f, 0.0f), 1);
-		Model model = new Model("image", "dragon_2", model_init_transform);
-		model.SetRotation(new Vector3f(0f, 180f, 0f));
+		ModelRaw model_raw = new ModelRaw("image", "dragon_2");
+		for(int i = 0; i < 2; i++) {
+			ModelInitTransform model_init_transform = new ModelInitTransform(new Vector3f(0, -10, -17f), new Vector3f(0, 0, 0), 1f);
+			Model model = new Model(model_raw, model_init_transform);
+			ModelRenderer.Add_Model(model_raw, model);
+		}
 		
 		Light light = new Light(new Vector3f(1, 1, 1), new Vector3f(20f, 0f, 0.0f));
 		
 		while(!glfwWindowShouldClose(DisplayManager.window)){
 			DisplayManager.StartFrame();
+
 			
-			model.SetDeltaRotation(new Vector3f(0f, -.01f, 0f));
-			
-			model_renderer.Prepare(model);
-			model_renderer.Render(model, camera, light);
+			ModelRenderer.Render(camera, light);
 			
 			DisplayManager.Update();
 			DisplayManager.EndFrame();
 		}
 		
-		model.GetModelRaw().GetModelShader().ProgramCleanup();
+		//MAKE SURE TO CLEANUP SHADERS HAVENT DONE THAT YET
 		TextureManager.Unload();
 		BufferManager.UnloadBuffers();
 		DisplayManager.Unload();

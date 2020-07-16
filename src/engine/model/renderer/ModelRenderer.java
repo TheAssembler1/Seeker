@@ -10,16 +10,19 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL32.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import engine.camera.Camera;
 import engine.display.DisplayManager;
 import engine.light.Light;
 import engine.maths.Matrices;
 import engine.model.Model;
+import engine.model.ModelRaw;
 
 public class ModelRenderer {
 	
@@ -27,7 +30,22 @@ public class ModelRenderer {
 	private static final int FAR_PLANE = 1000;
 	private static final float NEAR_PLANE = 0.1f;
 	
-	public void Prepare(Model model) {
+	private static HashMap<ModelRaw, List<Model>> model_render = new HashMap<ModelRaw, List<Model>>();
+	
+	public static void Add_Model(ModelRaw model_raw, Model model) {
+		if(ModelRenderer.model_render.containsKey(model_raw)) {
+			List<Model> batch = ModelRenderer.model_render.get(model_raw);
+			batch.add(model);
+		}else {
+			List<Model> batch = new ArrayList<Model>();
+			batch.add(model);
+			ModelRenderer.model_render.put(model_raw, batch);
+		}
+		
+		System.out.println(ModelRenderer.model_render.size());
+	}
+	
+	public static void Prepare(Model model) {
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_CULL_FACE);
@@ -39,7 +57,17 @@ public class ModelRenderer {
 		model.GetModelRaw().GetModelShader().StopProgram();
 	}
 	
-	public void Render(Model model, Camera camera, Light light) {
+	public static void Render(Camera camera, Light light) {
+		for(List<Model> batch : ModelRenderer.model_render.values()) {
+			Prepare(batch.get(0));
+			for(Model batch_model : batch) {
+				RenderBatchModel(batch_model, camera, light);
+			}
+		}
+	}
+	
+	public static void RenderBatchModel(Model model, Camera camera, Light light) {
+		model.SetDeltaRotation(new Vector3f(0.0f, 0.01f, 0.0f));
 		model.GetModelRaw().GetModelShader().StartProgram();
 		Matrix4f transformation_matrix = Matrices.CreateTransformationMatrix(model);
 		model.GetModelRaw().GetModelShader().LoadMatrix4("transformation_matrix", transformation_matrix);

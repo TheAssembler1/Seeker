@@ -5,15 +5,15 @@ import org.lwjgl.util.vector.Vector3f;
 public abstract class ModelBase{
 	private Vector3f position;
 	private Vector3f rotation;
-	private int scale;
-	ModelRaw model_raw;
+	private float scale;
+	private ModelRaw model_raw;
 	
 	private float ambient = 0.1f;
 	private float shine_damper = 1;
 	private float reflectivity = .4f;
 
-	public ModelBase(String texture_file_name, String model_file_name, ModelInitTransform model_init_transform) {
-		this.model_raw = new ModelRaw(texture_file_name, model_file_name);
+	public ModelBase(ModelRaw model_raw, ModelInitTransform model_init_transform) {
+		this.model_raw = model_raw;
 		this.position = model_init_transform.GetPosition();
 		this.rotation = model_init_transform.GetRotation();
 		this.scale = model_init_transform.GetScale();
@@ -69,7 +69,7 @@ public abstract class ModelBase{
 		return this.rotation;
 	}
 	
-	public int GetScale() {
+	public float GetScale() {
 		return this.scale;
 	}
 	

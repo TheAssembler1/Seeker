@@ -5,9 +5,9 @@ import org.lwjgl.util.vector.Vector3f;
 public class ModelInitTransform {
 	private Vector3f position;
 	private Vector3f rotation;
-	private int scale;
+	private float scale;
 	
-	public ModelInitTransform(Vector3f position, Vector3f rotation, int scale) {
+	public ModelInitTransform(Vector3f position, Vector3f rotation, float scale) {
 		this.position = position;
 		this.rotation = rotation;
 		this.scale = scale;
@@ -21,7 +21,7 @@ public class ModelInitTransform {
 		return this.rotation;
 	}
 	
-	public int GetScale() {
+	public float GetScale() {
 		return this.scale;
 	}
 }
