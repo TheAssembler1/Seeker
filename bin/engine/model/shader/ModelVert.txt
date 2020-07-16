@@ -1,0 +1,25 @@
+#version 330 core
+
+layout (location = 0) in vec3 in_vert_positions;
+layout (location = 1) in vec2 in_texture_positions;
+layout (location = 2) in vec3 in_normal_positions;
+
+out vec2 texture_coords;
+out vec3 normal_positions;
+out vec3 to_light_vector;
+out vec3 to_camera_vector;
+
+uniform mat4 transformation_matrix;
+uniform mat4 projection_matrix;
+uniform mat4 view_matrix;
+uniform vec3 light_position;
+
+void main(){
+	vec4 world_position = transformation_matrix * vec4(in_vert_positions, 1.0);
+	
+	gl_Position = projection_matrix * view_matrix  * world_position;
+	texture_coords = in_texture_positions;
+	normal_positions = (transformation_matrix * vec4(in_normal_positions, 0.0)).xyz;
+	to_light_vector = light_position - world_position.xyz;
+	to_camera_vector = (inverse(view_matrix) * vec4(0.0, 0.0, 0.0, 1.0)).xyz - world_position.xyz;
+}
